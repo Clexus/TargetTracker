@@ -49,7 +49,7 @@ public class PointsManager {
 
             int markEntityId = Bukkit.getUnsafe().nextEntityId();
             int targetEntityId = Bukkit.getUnsafe().nextEntityId();
-            // 发送生成包
+
             sendSpawnPacket(player, markEntityId, playerLocation, point.getMark().getScale());
             sendSpawnPacket(player, targetEntityId, targetLocation, point.getTarget().getScale());
 
