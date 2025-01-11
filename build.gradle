@@ -6,7 +6,12 @@ plugins {
 
 group = 'cn.clexus'
 version = '1.0'
-
+tasks.register('createJars', Jar) {
+    archiveBaseName.set('TargetTracker')
+    archiveVersion.set(version)
+    from sourceSets.main.output
+    destinationDirectory.set(file("$buildDir/allJars"))
+}
 repositories {
     mavenCentral()
     maven { url 'https://maven.evokegames.gg/snapshots' }
