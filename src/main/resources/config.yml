@@ -1,0 +1,11 @@
+message:
+  usage: '&c使用方法: /%label% <玩家名> <点ID> [是否触发动作]'
+  player-not-exist: '&c玩家%player%不在线或不存在'
+  point-not-found: '&c找不到指定的点: %point%'
+  track-started: '&a已开始为玩家%player%追踪点%point%'
+  track-start-failed: '&c开始失败，%player%已经有一个进行中的%point%追踪'
+  track-stopped: '&a已为玩家%player%停止点%point%的追踪，动作触发状态为%trigger%'
+  track-stopped-failed: '&c停止失败，玩家%player%没有进行中的%point%追踪'
+  reload: '&a已重载配置文件与追踪点'
+  reload-failed: '&c重载时出现错误，请查看控制台'
+  start-same-point: '不能开始同一个点的追踪: %point%'

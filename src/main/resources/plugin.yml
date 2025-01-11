@@ -1,0 +1,18 @@
+name: TargetTracker
+version: '1.0-SNAPSHOT'
+main: cn.clexus.targetTracker.TargetTracker
+api-version: '1.21'
+depend: [packetevents]
+commands:
+  starttrack:
+    description: start tracking a point
+    permission: targettracker.starttrack
+    usage: /starttrack <player> <pointID>
+  stoptrack:
+    description: stop tracking a point
+    permission: targettracker.stoptrack
+    usage: /stoptrack <player> <pointID> [triggeractions]
+  targettracker:
+    description: Main Command
+    permission: targettracker.main
+    usage: /targettracker reload
