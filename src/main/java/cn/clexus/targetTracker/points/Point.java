@@ -9,14 +9,16 @@ public class Point {
     private double triggerDistance; // 触发距离
     private int fadeSpeed; // 透明度淡出速度
     private List<String> actions; // 触发后执行的动作
+    private List<String> stopTriggers;
 
-    public Point(String id, Target target, Mark mark, double triggerDistance, int fadeSpeed, List<String> actions) {
+    public Point(String id, Target target, Mark mark, double triggerDistance, int fadeSpeed, List<String> actions, List<String> stopTriggers) {
         this.id = id;
         this.target = target;
         this.mark = mark;
         this.triggerDistance = triggerDistance;
         this.fadeSpeed = fadeSpeed;
         this.actions = actions;
+        this.stopTriggers = stopTriggers;
     }
 
     public String getId() {
@@ -65,5 +67,13 @@ public class Point {
 
     public void setActions(List<String> actions) {
         this.actions = actions;
+    }
+
+    public List<String> getStopTriggers() {
+        return stopTriggers;
+    }
+
+    public void setStopTriggers(List<String> stop_triggers) {
+        this.stopTriggers = stop_triggers;
     }
 }

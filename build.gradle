@@ -1,11 +1,11 @@
 plugins {
     id "java-library"
-    id "io.papermc.paperweight.userdev" version "2.0.0-beta.12"
+    id "io.papermc.paperweight.userdev" version "2.0.0-beta.13"
     id 'com.gradleup.shadow' version '9.0.0-beta4'
 }
 
 group = 'cn.clexus'
-version = '1.0'
+version = '1.1'
 tasks.register('createJars', Jar) {
     archiveBaseName.set('TargetTracker')
     archiveVersion.set(version)
@@ -14,6 +14,9 @@ tasks.register('createJars', Jar) {
 }
 repositories {
     mavenCentral()
+    maven {
+        url = 'https://repo.extendedclip.com/releases/'
+    }
     maven { url 'https://maven.evokegames.gg/snapshots' }
     maven { url = uri("https://repo.codemc.io/repository/maven-releases/") }
 
@@ -31,6 +34,7 @@ repositories {
 
 dependencies {
     implementation 'me.tofaa.entitylib:spigot:2.4.11-SNAPSHOT'
+    compileOnly 'me.clip:placeholderapi:2.11.6'
     compileOnly("com.github.retrooper:packetevents-spigot:2.7.0")
     paperweight.paperDevBundle("1.21.4-R0.1-SNAPSHOT")
 }

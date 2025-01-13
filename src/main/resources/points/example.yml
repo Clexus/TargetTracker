@@ -13,6 +13,13 @@ point1:
       - '%distance%格'
   trigger-distance: 4
   fade-speed: 10
+  stop-triggers:
+    - 'quit'
+    - 'death'
+    - 'attack'
+    - 'damaged'
+    - 'world_change'
+    - 'teleport'
   actions:
     - 'command: say a'
     - 'op: say b'

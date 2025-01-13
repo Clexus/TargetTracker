@@ -1,6 +1,7 @@
 package cn.clexus.targetTracker.managers;
 import cn.clexus.targetTracker.TargetTracker;
 import cn.clexus.targetTracker.utils.I18n;
+import cn.clexus.targetTracker.utils.ParseUtil;
 import com.github.retrooper.packetevents.protocol.world.Location;
 import org.bukkit.*;
 import org.bukkit.configuration.file.FileConfiguration;
@@ -19,6 +20,7 @@ import cn.clexus.targetTracker.points.Target;
 import cn.clexus.targetTracker.utils.FireworkHandler;
 import org.bukkit.configuration.ConfigurationSection;
 
+import javax.annotation.Nullable;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -29,9 +31,24 @@ public class PointsManager {
     private static final PointsManager instance = new PointsManager();
     private final Map<String, Point> points = new HashMap<>();
     private final Map<String, TrackTask> activeTracks = new HashMap<>();
+    private final Map<UUID, List<Point>> savedPoints = new HashMap<>();
 
     public static PointsManager getInstance() {
         return instance;
+    }
+    public int getMarkEntityId(Point point, Player player) {
+        TrackTask task =  activeTracks.get(player.getUniqueId()+":"+point.getId());
+        if(task != null) {
+            return task.getMarkEntityId();
+        }
+        return -1;
+    }
+    public int getTargetEntityId(Point point, Player player) {
+        TrackTask task =  activeTracks.get(player.getUniqueId()+":"+point.getId());
+        if(task != null) {
+            return task.getTargetEntityId();
+        }
+        return -1;
     }
     public boolean startTrack(Point point, Player player) {
             if(activeTracks.containsKey(player.getUniqueId()+":"+point.getId())) {
@@ -107,6 +124,7 @@ public class PointsManager {
         public int getMarkEntityId() {
             return markEntityId;
         }
+
         public int getTargetEntityId() {
             return targetEntityId;
         }
@@ -126,7 +144,9 @@ public class PointsManager {
         @Override
         public void run() {
             if (!player.isOnline()) {
-                stopTrack(player,point, false);
+                return;
+            }
+            if(target.getWorld()!=player.getWorld()) {
                 return;
             }
 
@@ -135,7 +155,9 @@ public class PointsManager {
             double playerToTargetDistance = player.getLocation().distance(target);
 
             double distance = Math.min(initialDistance, playerToTargetDistance - 0.5);
-            sendTextChangePacket(player,markEntityId,point.getMark().getDisplay(),(int)playerToTargetDistance);
+            int intDistance = (int)Math.ceil(playerToTargetDistance);
+            sendTextChangePacket(player,markEntityId,point.getMark().getDisplay(),intDistance);
+            sendTextChangePacket(player,targetEntityId,point.getTarget().getDisplay(),intDistance);
             if (playerToTargetDistance <= 3) {
                 // 距离小于等于3格，标记固定在目标点
                 org.bukkit.Location targetLocation = point.getTarget().getLocation();
@@ -144,7 +166,6 @@ public class PointsManager {
                 // 距离大于等于触发距离，更新标记点位置
                 org.bukkit.Location newLocation = playerLocation.clone().add(direction.multiply(distance)).add(0, -0.5, 0);
                 sendTeleportPacket(player, markEntityId, newLocation);
-                opacity = Math.min(255, opacity + point.getFadeSpeed());
             }
             if (playerToTargetDistance < point.getTriggerDistance()) {
                 // 距离小于触发距离但大于3格，正常更新标记点位置
@@ -155,6 +176,8 @@ public class PointsManager {
                     stopTrack(player, point, true);
                     return;
                 }
+            }else{
+                opacity = Math.min(255, opacity + point.getFadeSpeed());
             }
 
             byte displayOpacity = (byte) (opacity > 127 ? opacity - 256 : opacity);
@@ -235,8 +258,11 @@ public class PointsManager {
             // 加载 actions
             List<String> actions = pointSection.getStringList("actions");
 
+            // 加载 stop_triggers
+            List<String> stop_triggers = pointSection.getStringList("stop-triggers");
+
             // 创建并存储点
-            Point point = new Point(pointId, target, mark, triggerDistance, fadeSpeed, actions);
+            Point point = new Point(pointId, target, mark, triggerDistance, fadeSpeed, actions, stop_triggers);
             points.put(pointId, point);
         }
     }
@@ -247,6 +273,27 @@ public class PointsManager {
      */
     public Collection<Point> getAllPoints() {
         return points.values();
+    }
+
+    public List<Point> getAllActivePoints(Player player) {
+        List<Point> activePoints = new ArrayList<>();
+
+        // 遍历所有追踪任务，找到属于指定玩家的点
+        for (TrackTask task : activeTracks.values()) {
+            if (task.getPlayer().equals(player)) {
+                activePoints.add(task.getPoint());
+            }
+        }
+
+        return activePoints;
+    }
+    public boolean isActive(Player player, Point point) {
+        for (TrackTask task : activeTracks.values()) {
+            if (task.getPlayer().equals(player)&&task.getPoint().equals(point)) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -263,6 +310,7 @@ public class PointsManager {
      */
     public void removeAllPoints() {
         points.clear();
+        savedPoints.clear();
     }
     /**
      * 移除点。
@@ -279,13 +327,69 @@ public class PointsManager {
     public void addOrUpdatePoint(Point point) {
         points.put(point.getId(), point);
     }
-
+    public void savePlayerToPoint(Player player,Point point) {
+        List<Point> points = savedPoints.get(player.getUniqueId()) == null ? new ArrayList<>() : savedPoints.get(player.getUniqueId());
+        points.add(point);
+        savedPoints.put(player.getUniqueId(), points);
+    }
+    public List<Point> getPlayerSavedPoints(Player player) {
+        List<Point> points = new ArrayList<>();
+        if (savedPoints.containsKey(player.getUniqueId())) {
+            points = savedPoints.get(player.getUniqueId());
+        }
+        return points;
+    }
+    public void removePlayerFromPoint(Player player, Point point) {
+        List<Point> points = savedPoints.get(player.getUniqueId());
+        points.remove(point);
+        savedPoints.put(player.getUniqueId(), points);
+    }
     public void stopAllPoints() {
         for(TrackTask task : activeTracks.values()){
             task.cancel();
             task.removeEntities();
         }
         activeTracks.clear();
+    }
+    public void stopAllPointsForPlayer(Player player, boolean trigger) {
+        // 创建一个列表用于存储需要停止的任务 ID
+        List<String> pointsToStop = new ArrayList<>();
+
+        // 遍历所有追踪任务，找到属于该玩家的任务
+        for (Map.Entry<String, TrackTask> entry : activeTracks.entrySet()) {
+            TrackTask task = entry.getValue();
+            if (task.getPlayer().equals(player)) {
+                pointsToStop.add(entry.getKey());
+            }
+        }
+
+        // 停止所有找到的任务
+        for (String trackId : pointsToStop) {
+            TrackTask task = activeTracks.remove(trackId);
+            if (task != null) {
+                stopTrack(task.getPlayer(), task.getPoint(), trigger);
+            }
+        }
+    }
+    public void stopAllPlayersForPoint(Point point, boolean trigger) {
+        // 创建一个列表用于存储需要停止的任务 ID
+        List<String> pointsToStop = new ArrayList<>();
+
+        // 遍历所有追踪任务，找到与指定点相关的任务
+        for (Map.Entry<String, TrackTask> entry : activeTracks.entrySet()) {
+            TrackTask task = entry.getValue();
+            if (task.getPoint().equals(point)) {
+                pointsToStop.add(entry.getKey());
+            }
+        }
+
+        // 停止所有找到的任务
+        for (String trackId : pointsToStop) {
+            TrackTask task = activeTracks.remove(trackId);
+            if (task != null) {
+                stopTrack(task.getPlayer(), task.getPoint(), trigger);
+            }
+        }
     }
     /**
      * 执行指定的动作。
@@ -295,6 +399,7 @@ public class PointsManager {
     private void executeActions(Point point, Player player) {
         List<String> actions = point.getActions();
         for (String action : actions) {
+            action = ParseUtil.parsePlaceholders(action, point, player);
             if (action.startsWith("command:")) {
                 player.performCommand(action.substring(8));
             } else if (action.startsWith("op:")) {

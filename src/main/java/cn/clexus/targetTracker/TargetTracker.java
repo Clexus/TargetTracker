@@ -2,19 +2,24 @@ package cn.clexus.targetTracker;
 
 import cn.clexus.targetTracker.commands.ReloadCommand;
 import cn.clexus.targetTracker.commands.TrackerCommand;
+import cn.clexus.targetTracker.listeners.EventsListener;
 import cn.clexus.targetTracker.managers.PointsManager;
+import cn.clexus.targetTracker.support.PlaceholderAPIExpansion;
+import cn.clexus.targetTracker.support.PlaceholderAPISupport;
 import cn.clexus.targetTracker.utils.I18n;
 import com.github.retrooper.packetevents.PacketEvents;
 import io.github.retrooper.packetevents.factory.spigot.SpigotPacketEventsBuilder;
 import me.tofaa.entitylib.APIConfig;
 import me.tofaa.entitylib.EntityLib;
 import me.tofaa.entitylib.spigot.SpigotEntityLibPlatform;
+import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
+import java.util.EventListener;
 import java.util.logging.Level;
 
 public final class TargetTracker extends JavaPlugin {
@@ -57,6 +62,8 @@ public final class TargetTracker extends JavaPlugin {
         getCommand("starttrack").setTabCompleter(new TrackerCommand());
         getCommand("stoptrack").setExecutor(new TrackerCommand());
         getCommand("stoptrack").setTabCompleter(new TrackerCommand());
+        Bukkit.getPluginManager().registerEvents(new EventsListener(),this);
+        PlaceholderAPISupport.init(this);
     }
     private void saveDefaultExampleFile() {
         File exampleFile = new File(pointsFolder, "example.yml");

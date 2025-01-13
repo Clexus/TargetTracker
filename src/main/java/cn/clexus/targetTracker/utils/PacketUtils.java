@@ -1,5 +1,6 @@
 package cn.clexus.targetTracker.utils;
 
+import cn.clexus.targetTracker.support.PlaceholderAPISupport;
 import com.github.retrooper.packetevents.PacketEvents;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityData;
 import com.github.retrooper.packetevents.protocol.entity.data.EntityDataTypes;
@@ -10,6 +11,7 @@ import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerDe
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityMetadata;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerEntityTeleport;
 import com.github.retrooper.packetevents.wrapper.play.server.WrapperPlayServerSpawnEntity;
+import me.clip.placeholderapi.PlaceholderAPI;
 import me.tofaa.entitylib.meta.EntityMeta;
 import me.tofaa.entitylib.meta.display.AbstractDisplayMeta;
 import me.tofaa.entitylib.meta.display.TextDisplayMeta;
@@ -58,7 +60,10 @@ public class PacketUtils {
             }
             // 使用 MiniMessage 转换 & 格式
             String convertedLine = displayLines.get(i).replace('&', '§'); // 将 & 替换为 §
-            convertedLine = convertedLine.replaceAll("%distance%", String.valueOf(distance));
+            convertedLine = convertedLine.replaceAll("%distance%", String.valueOf(distance)).replaceAll("%player%", player.getName());
+            if(PlaceholderAPISupport.hasSupport()){
+                convertedLine = PlaceholderAPI.setPlaceholders(player, convertedLine);
+            }
             displayText = displayText.append(LegacyComponentSerializer.legacySection().deserialize(convertedLine));
         }
         WrapperPlayServerEntityMetadata metadataPacket = new WrapperPlayServerEntityMetadata(
