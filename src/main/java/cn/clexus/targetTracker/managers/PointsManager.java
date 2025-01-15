@@ -351,7 +351,7 @@ public class PointsManager {
         }
         activeTracks.clear();
     }
-    public void stopAllPointsForPlayer(Player player, boolean trigger) {
+    public boolean stopAllPointsForPlayer(Player player, boolean trigger) {
         // 创建一个列表用于存储需要停止的任务 ID
         List<String> pointsToStop = new ArrayList<>();
 
@@ -362,14 +362,18 @@ public class PointsManager {
                 pointsToStop.add(entry.getKey());
             }
         }
-
+        if(pointsToStop.isEmpty()){
+            return false;
+        }
         // 停止所有找到的任务
         for (String trackId : pointsToStop) {
             TrackTask task = activeTracks.remove(trackId);
             if (task != null) {
                 stopTrack(task.getPlayer(), task.getPoint(), trigger);
+                return true;
             }
         }
+        return false;
     }
     public void stopAllPlayersForPoint(Point point, boolean trigger) {
         // 创建一个列表用于存储需要停止的任务 ID

@@ -9,3 +9,5 @@ message:
   reload: '&a已重载配置文件与追踪点'
   reload-failed: '&c重载时出现错误，请查看控制台'
   start-same-point: '不能开始同一个点的追踪: %point%'
+  all-tracks-stopped: '&c已为玩家%player%停止所有点的追踪'
+  all-tracks-stopped-failed: '&c玩家%player%没有任何已在追踪的点'

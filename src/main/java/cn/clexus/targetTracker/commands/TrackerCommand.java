@@ -21,6 +21,19 @@ public class TrackerCommand implements CommandExecutor, TabCompleter {
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
+            if(label.equalsIgnoreCase("stoptrack")&&args.length==1) {
+                Player targetPlayer = Bukkit.getPlayer(args[0]);
+                if (targetPlayer == null) {
+                    I18n.sendMessage(sender,"player-not-exist",Map.of("player", args[0]));
+                    return true;
+                }
+                if(PointsManager.getInstance().stopAllPointsForPlayer(targetPlayer,false)){
+                    I18n.sendMessage(sender,"all-tracks-stopped",Map.of("player", args[0]));
+                }else{
+                    I18n.sendMessage(sender,"all-tracks-stopped-failed",Map.of("player", args[0]));
+                }
+                return true;
+            }
             I18n.sendMessage(sender,"usage", Map.of("label", label));
             return true;
         }
