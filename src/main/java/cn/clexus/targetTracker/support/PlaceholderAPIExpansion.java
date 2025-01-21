@@ -47,7 +47,8 @@ public class PlaceholderAPIExpansion extends PlaceholderExpansion {
         if(!offlinePlayer.isOnline()) return "";
         Player player = (Player) offlinePlayer;
         String[] param = params.split("_");
-        String error = "%targettracker_active/all_amount%\n" +
+        String error = "%targettracker_isactive_<id>%+\n"+
+                "%targettracker_active/all_amount%\n" +
                 "%targettracker_active/all_nearest/furthest_distance%\n" +
                 "%targettracker_active/all_nearest/furthest_markdisplay%\n" +
                 "%targettracker_active/all_nearest/furthest_targetdisplay%\n" +
@@ -57,6 +58,8 @@ public class PlaceholderAPIExpansion extends PlaceholderExpansion {
                 "%targettracker_point_<id>_targetdisplay%\n";
         if (param.length != 3 && param.length != 2) {
             return error;
+        } else if(param.length == 2 && param[0].equals("isactive")) {
+          return PointsManager.getInstance().getAllActivePoints(player).contains(PointsManager.getInstance().getPointById(param[1])) ? "yes" : "no";
         } else if (param.length == 2 && param[1].equals("amount")) {
             if(param[0].equals("active")){
                 return String.valueOf(PointsManager.getInstance().getAllActivePoints(player).size());
