@@ -1,5 +1,7 @@
 package cn.clexus.targetTracker.managers;
 import cn.clexus.targetTracker.TargetTracker;
+import cn.clexus.targetTracker.events.TrackStartEvent;
+import cn.clexus.targetTracker.events.TrackStopEvent;
 import cn.clexus.targetTracker.utils.I18n;
 import cn.clexus.targetTracker.utils.ParseUtil;
 import com.github.retrooper.packetevents.protocol.world.Location;
@@ -51,36 +53,42 @@ public class PointsManager {
         return -1;
     }
     public boolean startTrack(Point point, Player player) {
-            if(activeTracks.containsKey(player.getUniqueId()+":"+point.getId())) {
-                return false;
-            }
-            Location playerLocation = new Location(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
-            Location targetLocation = new Location(
-                    point.getTarget().getLocation().getX(),
-                    point.getTarget().getLocation().getY(),
-                    point.getTarget().getLocation().getZ(),
-                    0,
-                    0
-            );
-            double initialDistance = point.getMark().getDistance();
-
-            int markEntityId = Bukkit.getUnsafe().nextEntityId();
-            int targetEntityId = Bukkit.getUnsafe().nextEntityId();
-
-            sendSpawnPacket(player, markEntityId, playerLocation, point.getMark().getScale());
-            sendSpawnPacket(player, targetEntityId, targetLocation, point.getTarget().getScale());
-
-            int distance = (int) player.getLocation().distance(point.getTarget().getLocation());
-            sendTextChangePacket(player, markEntityId, point.getMark().getDisplay(), distance);
-            sendTextChangePacket(player, targetEntityId, point.getTarget().getDisplay(), distance);
-
-            TrackTask task = new TrackTask(player, point, markEntityId, targetEntityId, point.getTarget().getLocation(), initialDistance);
-            task.runTaskTimer(TargetTracker.getInstance(), 0L, 1L);
-            activeTracks.put(player.getUniqueId()+":"+point.getId(), task);
-            return true;
+        TrackStartEvent event = new TrackStartEvent(player, point);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled()) {
+            return false;
+        }
+        if(activeTracks.containsKey(player.getUniqueId()+":"+point.getId())) {
+            return false;
+        }
+        Location playerLocation = new Location(player.getX(), player.getY(), player.getZ(), player.getYaw(), player.getPitch());
+        Location targetLocation = new Location(
+                point.getTarget().getLocation().getX(),
+                point.getTarget().getLocation().getY(),
+                point.getTarget().getLocation().getZ(),
+                0,
+                0
+        );
+        double initialDistance = point.getMark().getDistance();
+        int markEntityId = Bukkit.getUnsafe().nextEntityId();
+        int targetEntityId = Bukkit.getUnsafe().nextEntityId();
+        sendSpawnPacket(player, markEntityId, playerLocation, point.getMark().getScale());
+        sendSpawnPacket(player, targetEntityId, targetLocation, point.getTarget().getScale());
+        int distance = (int) player.getLocation().distance(point.getTarget().getLocation());
+        sendTextChangePacket(player, markEntityId, point.getMark().getDisplay(), distance);
+        sendTextChangePacket(player, targetEntityId, point.getTarget().getDisplay(), distance);
+        TrackTask task = new TrackTask(player, point, markEntityId, targetEntityId, point.getTarget().getLocation(), initialDistance);
+        task.runTaskTimer(TargetTracker.getInstance(), 0L, 1L);
+        activeTracks.put(player.getUniqueId()+":"+point.getId(), task);
+        return true;
     }
 
     public boolean stopTrack(Player player, Point point, boolean trigger) {
+        TrackStopEvent event = new TrackStopEvent(player, point, trigger);
+        Bukkit.getPluginManager().callEvent(event);
+        if(event.isCancelled()) {
+            return false;
+        }
         TrackTask task = activeTracks.remove(player.getUniqueId()+":"+point.getId());
         if (task != null) {
             task.cancel();
