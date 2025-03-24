@@ -74,7 +74,10 @@ public class PointsManager {
         int targetEntityId = Bukkit.getUnsafe().nextEntityId();
         sendSpawnPacket(player, markEntityId, playerLocation, point.getMark().getScale());
         sendSpawnPacket(player, targetEntityId, targetLocation, point.getTarget().getScale());
-        int distance = (int) player.getLocation().distance(point.getTarget().getLocation());
+        int distance = 0;
+        if(player.getWorld() == point.getTarget().getLocation().getWorld()) {
+            distance = (int) player.getLocation().distance(point.getTarget().getLocation());
+        }
         sendTextChangePacket(player, markEntityId, point.getMark().getDisplay(), distance);
         sendTextChangePacket(player, targetEntityId, point.getTarget().getDisplay(), distance);
         TrackTask task = new TrackTask(player, point, markEntityId, targetEntityId, point.getTarget().getLocation(), initialDistance);
@@ -168,8 +171,8 @@ public class PointsManager {
             sendTextChangePacket(player,targetEntityId,point.getTarget().getDisplay(),intDistance);
             if (playerToTargetDistance <= 3) {
                 // 距离小于等于3格，标记固定在目标点
-                org.bukkit.Location targetLocation = point.getTarget().getLocation();
-                sendTeleportPacket(player, markEntityId, targetLocation);
+                org.bukkit.Location targetLocation = point.getTarget().getLocation().clone();
+                sendTeleportPacket(player, markEntityId, targetLocation.add(0,-0.5,0));
             }else {
                 // 距离大于等于触发距离，更新标记点位置
                 org.bukkit.Location newLocation = playerLocation.clone().add(direction.multiply(distance)).add(0, -0.5, 0);
@@ -375,7 +378,7 @@ public class PointsManager {
         }
         // 停止所有找到的任务
         for (String trackId : pointsToStop) {
-            TrackTask task = activeTracks.remove(trackId);
+            TrackTask task = activeTracks.get(trackId);
             if (task != null) {
                 stopTrack(task.getPlayer(), task.getPoint(), trigger);
                 return true;
@@ -397,7 +400,7 @@ public class PointsManager {
 
         // 停止所有找到的任务
         for (String trackId : pointsToStop) {
-            TrackTask task = activeTracks.remove(trackId);
+            TrackTask task = activeTracks.get(trackId);
             if (task != null) {
                 stopTrack(task.getPlayer(), task.getPoint(), trigger);
             }

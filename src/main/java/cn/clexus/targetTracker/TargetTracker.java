@@ -42,7 +42,6 @@ public final class TargetTracker extends JavaPlugin {
         SpigotEntityLibPlatform platform = new SpigotEntityLibPlatform(this);
         APIConfig settings = new APIConfig(PacketEvents.getAPI())
                 .debugMode()
-                .checkForUpdates()
                 .tickTickables()
                 .useBstats()
                 .usePlatformLogger();
