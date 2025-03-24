@@ -30,7 +30,7 @@ jobs:
         run: mkdir TargetTracker && cp build/allJars/*.jar TargetTracker
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TargetTracker-Snapshot
           path: TargetTracker
