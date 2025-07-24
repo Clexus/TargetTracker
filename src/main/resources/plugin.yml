@@ -1,5 +1,5 @@
 name: TargetTracker
-version: '1.7'
+version: ${version}
 main: cn.clexus.targetTracker.TargetTracker
 api-version: '1.20'
 depend: [packetevents]

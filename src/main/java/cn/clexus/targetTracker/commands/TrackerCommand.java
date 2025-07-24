@@ -9,7 +9,6 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.TabCompleter;
 import org.bukkit.entity.Player;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
 import java.util.List;
@@ -18,23 +17,24 @@ import java.util.stream.Collectors;
 
 public class TrackerCommand implements CommandExecutor, TabCompleter {
     PointsManager pointsManager = PointsManager.getInstance();
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length < 2) {
-            if(label.equalsIgnoreCase("stoptrack")&&args.length==1) {
+            if (label.equalsIgnoreCase("stoptrack") && args.length == 1) {
                 Player targetPlayer = Bukkit.getPlayer(args[0]);
                 if (targetPlayer == null) {
-                    I18n.sendMessage(sender,"player-not-exist",Map.of("player", args[0]));
+                    I18n.sendMessage(sender, "player-not-exist", Map.of("player", args[0]));
                     return true;
                 }
-                if(PointsManager.getInstance().stopAllPointsForPlayer(targetPlayer,false)){
-                    I18n.sendMessage(sender,"all-tracks-stopped",Map.of("player", args[0]));
-                }else{
-                    I18n.sendMessage(sender,"all-tracks-stopped-failed",Map.of("player", args[0]));
+                if (PointsManager.getInstance().stopAllPointsForPlayer(targetPlayer, false)) {
+                    I18n.sendMessage(sender, "all-tracks-stopped", Map.of("player", args[0]));
+                } else {
+                    I18n.sendMessage(sender, "all-tracks-stopped-failed", Map.of("player", args[0]));
                 }
                 return true;
             }
-            I18n.sendMessage(sender,"usage", Map.of("label", label));
+            I18n.sendMessage(sender, "usage", Map.of("label", label));
             return true;
         }
 
@@ -44,32 +44,37 @@ public class TrackerCommand implements CommandExecutor, TabCompleter {
 
         Player targetPlayer = Bukkit.getPlayer(playerName);
         if (targetPlayer == null) {
-            I18n.sendMessage(sender,"player-not-exist",Map.of("player", playerName));
+            I18n.sendMessage(sender, "player-not-exist", Map.of("player", playerName));
             return true;
         }
 
         Point point = pointsManager.getPointById(pointId);
         if (point == null) {
-            I18n.sendMessage(sender,"point-not-found",Map.of("point", pointId));
+            I18n.sendMessage(sender, "point-not-found", Map.of("point", pointId));
             return true;
         }
 
         if (label.equalsIgnoreCase("startTrack")) {
-            if(pointsManager.startTrack(point, targetPlayer)){
-                I18n.sendMessage(sender,"track-started",Map.of("point", pointId,"player", playerName));
-            }else{
-                I18n.sendMessage(sender,"track-start-failed",Map.of("point", pointId,"player", playerName));
+            switch (pointsManager.startTrack(point, targetPlayer)) {
+                case SUCCESS ->
+                        I18n.sendMessage(sender, "track-started", Map.of("point", pointId, "player", playerName));
+                case ALREADY_TRACKING ->
+                        I18n.sendMessage(sender, "track-start-failed", Map.of("point", pointId, "player", playerName));
+                case CANCELLED -> I18n.sendMessage(sender, "track-cancelled");
             }
         } else if (label.equalsIgnoreCase("stopTrack")) {
-            if(pointsManager.stopTrack(targetPlayer, point, triggerActions)){
-                I18n.sendMessage(sender,"track-stopped",Map.of("point", pointId,"player", playerName,"trigger",String.valueOf(triggerActions)));
-            }else{
-                I18n.sendMessage(sender,"track-stopped-failed",Map.of("point", pointId,"player", playerName));
+            switch (pointsManager.stopTrack(targetPlayer, point, triggerActions)) {
+                case SUCCESS ->
+                        I18n.sendMessage(sender, "track-stopped", Map.of("point", pointId, "player", playerName, "trigger", String.valueOf(triggerActions)));
+                case CANCELLED -> I18n.sendMessage(sender, "track-cancelled");
+                case NOT_FOUND ->
+                        I18n.sendMessage(sender, "track-stopped-failed", Map.of("point", pointId, "player", playerName));
             }
         }
 
         return true;
     }
+
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 1) {

@@ -1,3 +1,52 @@
+player-points:
+  enabled: true
+  max-range: -1
+  max-lines: 2 #如果玩家拥有自定义文本权限(custom-text)，他最多可以输入几行，设置为0则不限制
+  permissions: #权限留空则不需要权限
+    open: "targettracker.player.open"
+    start: "targettracker.player.start"
+    share: "targettracker.player.share"
+    stop: ""
+    list: "targettracker.player.list"
+    text-display: ""
+    block-display: "targettracker.player.block"
+    item-display: "targettracker.player.item"
+    beam: "targettracker.player.beam"
+    custom-text: "targettracker.player.custom.text"
+    custom-block: "targettracker.player.custom.block"
+    custom-item: "targettracker.player.custom.item"
+    text-color: "targettracker.player.text.color"
+    text-format: "targettracker.player.text.format"
+  defaults:
+    show-in-list: true
+    display: "追踪点"
+    target:
+      type: text
+      scale: 2
+      beam:
+        length: 255
+        width: 1
+        spinspeed: 1
+        block: "glass"
+        offset: 0
+      display:
+      - '⨀'
+    mark:
+      type: text
+      scale: 1
+      distance: 5
+      display:
+      - '✥'
+      - '%distance%格'
+    trigger-distance: 4
+    fade-speed: 10
+    stop-triggers:
+    - 'quit'
+    - 'death'
+    - 'attack'
+    - 'damaged'
+    - 'world_change'
+    - 'teleport'
 message:
   usage: '&c使用方法: /%label% <玩家名> <点ID> [是否触发动作]'
   player-not-exist: '&c玩家%player%不在线或不存在'
@@ -6,8 +55,40 @@ message:
   track-start-failed: '&c开始失败，%player%已经有一个进行中的%point%追踪'
   track-stopped: '&a已为玩家%player%停止点%point%的追踪，动作触发状态为%trigger%'
   track-stopped-failed: '&c停止失败，玩家%player%没有进行中的%point%追踪'
+  track-cancelled: '&c停止失败，该操作已被取消'
+  not-player: '&c只有玩家才能使用该命令'
   reload: '&a已重载配置文件与追踪点'
   reload-failed: '&c重载时出现错误，请查看控制台'
   start-same-point: '不能开始同一个点的追踪: %point%'
   all-tracks-stopped: '&c已为玩家%player%停止所有点的追踪'
   all-tracks-stopped-failed: '&c玩家%player%没有任何已在追踪的点'
+  dialog-title: '&6请选择操作'
+  dialog-start-title: '&6请输入参数'
+  dialog-list-title: '&6进行中的追踪'
+  dialog-stop-title: '&6停止追踪'
+  dialog-display-types: '&f标记类型'
+  dialog-display-text: '&a文本'
+  dialog-display-block: '&a方块'
+  dialog-display-item: '&a物品'
+  dialog-confirm: '&a确认'
+  dialog-cancel: '&c取消'
+  dialog-start: '&a创建追踪点'
+  dialog-stop: '&c停止进行中的追踪'
+  dialog-list: '&a查看进行中的追踪'
+  dialog-location: '&a目标点坐标，格式为x,y,z'
+  dialog-custom-display: '&a自定义展示名，仅用于列表展示'
+  dialog-custom-text: '&a自定义文本，显示在标记上'
+  dialog-custom-block: '&a自定义方块标记，请输入方块ID，如stone'
+  dialog-custom-item: '&a自定义物品标记，请输入物品ID，如diamond'
+  dialog-custom-beam: '&a自定义光柱所显示的方块，请输入方块ID，如tnt'
+  dialog-share: '&a你要分享追踪的玩家，以逗号分隔玩家名'
+  dialog-created-by-server: '&e系统创建'
+  dialog-created-by: '&e创建者: %player%'
+  dialog-no-points: '&c当前没有追踪点'
+  wrong-material: '&c无效的材质: %material%'
+  no-location: '&c你没有输入坐标'
+  too-close: '&c该点距离其他已追踪点过近，请重新输入坐标'
+  wrong-number: '&c参数数量不正确，你只需要输入x,y,z三个坐标'
+  invalid-number: '&c坐标必须为整数'
+  out-of-range: '&c追踪点超出允许范围，最大范围为 %distance% 格，你输入的坐标离你 %now-distance% 格'
+  point-share-message: '&e%player%&a向你发来了追踪共享&d(%display%: %location%)&a！点击加入共享！'

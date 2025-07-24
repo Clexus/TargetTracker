@@ -1,18 +1,25 @@
 package cn.clexus.targetTracker.points;
 
 import org.bukkit.Location;
+import org.bukkit.block.data.BlockData;
+import org.bukkit.inventory.ItemStack;
 
+import javax.annotation.Nullable;
 import java.util.List;
 
-public class Target {
+public class Target extends Icon{
     private Location location; // 目标点的坐标
-    private float scale;
-    private List<String> display; // 显示内容
+    @Nullable
+    private Beam beam;
 
-    public Target(Location location, List<String> display, float scale) {
+    public Target(Location location, List<String> display, float scale, Type type, BlockData blockData, ItemStack itemStack){
+        this(location, null, display, scale, type, blockData, itemStack);
+    }
+
+    public Target(Location location, @org.jetbrains.annotations.Nullable Beam beam, List<String> display, float scale, Type type, BlockData blockData, ItemStack itemStack) {
+        super(scale, display, type, blockData, itemStack);
         this.location = location;
-        this.display = display;
-        this.scale = scale;
+        this.beam = beam;
     }
 
     public Location getLocation() {
@@ -23,17 +30,11 @@ public class Target {
         this.location = location;
     }
 
-    public List<String> getDisplay() {
-        return display;
+    public Beam getBeam() {
+        return beam;
     }
 
-    public void setDisplay(List<String> display) {
-        this.display = display;
-    }
-    public float getScale() {
-        return scale;
-    }
-    public void setScale(float scale) {
-        this.scale = scale;
+    public void setBeam(Beam beam) {
+        this.beam = beam;
     }
 }

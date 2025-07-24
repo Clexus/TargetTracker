@@ -4,7 +4,6 @@ import cn.clexus.targetTracker.managers.PointsManager;
 import cn.clexus.targetTracker.points.Point;
 import cn.clexus.targetTracker.utils.PacketUtils;
 import com.github.retrooper.packetevents.protocol.world.Location;
-import org.bukkit.Bukkit;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -23,7 +22,7 @@ public class EventsListener implements Listener {
     @EventHandler
     public void onPlayerQuit(PlayerQuitEvent event) {
         Player player = event.getPlayer();
-        PointsManager.getInstance().getAllPoints().forEach(point -> {
+        PointsManager.getInstance().getAllActivePoints(player).forEach(point -> {
             if(!point.getStopTriggers().contains("quit")&&PointsManager.getInstance().isActive(player,point)) {
                 PointsManager.getInstance().savePlayerToPoint(player, point);
                 PointsManager.getInstance().stopTrack(player,point,false);
@@ -46,14 +45,14 @@ public class EventsListener implements Listener {
     @EventHandler
     public void onPlayerWorldChange(PlayerChangedWorldEvent event) {
         Player player = event.getPlayer();
-        PointsManager.getInstance().getAllPoints().forEach(point -> {
+        PointsManager.getInstance().getAllActivePoints(player).forEach(point -> {
             if(!point.getStopTriggers().contains("world_change")) {
                 if(point.getTarget().getLocation().getWorld()==event.getPlayer().getWorld()) {
                     int mark = PointsManager.getInstance().getMarkEntityId(point,player);
                     int target = PointsManager.getInstance().getTargetEntityId(point,player);
                     if(mark!=-1&&target!=-1) {
-                        PacketUtils.sendSpawnPacket(player,mark,new Location(player.getX(), player.getY(), player.getZ(), 0,0),point.getMark().getScale());
-                        PacketUtils.sendSpawnPacket(player,target,new Location(point.getTarget().getLocation().x(),point.getTarget().getLocation().y(),point.getTarget().getLocation().z(),0,0),point.getTarget().getScale());
+                        PacketUtils.sendSpawnPacket(player,point.getMark(),mark,new Location(player.getX(), player.getY(), player.getZ(), 0,0));
+                        PacketUtils.sendSpawnPacket(player,point.getTarget(),target,new Location(point.getTarget().getLocation().x(),point.getTarget().getLocation().y(),point.getTarget().getLocation().z(),0,0));
                     }
                 }
             }else{
@@ -81,7 +80,7 @@ public class EventsListener implements Listener {
     }
 
     private void stopTrack(Player player, String reason) {
-        PointsManager.getInstance().getAllPoints().forEach(point -> {
+        PointsManager.getInstance().getAllActivePoints(player).forEach(point -> {
             if(point.getStopTriggers().contains(reason)) {
                 PointsManager.getInstance().stopTrack(player, point, false);
             }

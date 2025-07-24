@@ -1,16 +1,16 @@
 package cn.clexus.targetTracker.points;
 
+import org.bukkit.block.data.BlockData;
+import org.bukkit.inventory.ItemStack;
+
 import java.util.List;
 
-public class Mark {
+public class Mark extends Icon{
     private double distance; // 标记点距离玩家的距离
-    private float scale;
-    private List<String> display; // 显示内容
 
-    public Mark(double distance, List<String> display, float scale) {
+    public Mark(double distance, List<String> display, float scale, Type type, BlockData blockData, ItemStack itemStack) {
+        super(scale,display,type,blockData,itemStack);
         this.distance = distance;
-        this.display = display;
-        this.scale = scale;
     }
 
     public double getDistance() {
@@ -21,17 +21,4 @@ public class Mark {
         this.distance = distance;
     }
 
-    public List<String> getDisplay() {
-        return display;
-    }
-
-    public void setDisplay(List<String> display) {
-        this.display = display;
-    }
-    public float getScale() {
-        return scale;
-    }
-    public void setScale(float scale) {
-        this.scale = scale;
-    }
 }

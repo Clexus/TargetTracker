@@ -1,50 +1,62 @@
 point1:
+  display: "<green>神秘标记"
+  show-in-list: true
   target:
+    type: text
+    # block: tnt[unstable=true]
+    # item: diamond_sword[unbreakable={}]
     scale: 2 #标记大小
+    beam: #beam是可选的
+      length: 255 #柱子的长度
+      width: 1 #柱子的宽度
+      spinspeed: 1 #柱子的旋转速度，负数反向
+      block: "tnt[unstable=true]" #方块
+      offset: 0.5 #上下偏移量
     location: world,100,100,100 #目标点坐标
     display:
-      - '&6?'
-      - '&a神秘标记'
+    - '&6?'
+    - '&a神秘标记'
   mark:
+    type: text
     scale: 1
     distance: 5 #距离玩家的距离
     display:
-      - '✥'
-      - '%distance%格'
+    - '✥'
+    - '%distance%格'
   trigger-distance: 4
   fade-speed: 10
   stop-triggers:
-    - 'quit'
-    - 'death'
-    - 'attack'
-    - 'damaged'
-    - 'world_change'
-    - 'teleport'
+  - 'quit'
+  - 'death'
+  - 'attack'
+  - 'damaged'
+  - 'world_change'
+  - 'teleport'
   actions:
-    - 'command: say a'
-    - 'op: say b'
-    - 'console: say c' #以玩家身份、op身份、控制台执行命令
-    - 'message: &4你完成了这个目标！'
-    - 'title: &4你完成了！;&6这个目标！;20;20;20'
-    - 'actionbar: &4你完成了这个目标！'
-    - 'sound: entity.player.death;1;0'
-    - 'lightning: target;100;100;100'
-    - 'firework: player;#123456,#654321,#111111;BALL;#123456,#000000;0' #生成烟花，参数分别是位置，颜色，类型，渐变颜色和飞行高度(对应power)
-    - 'start: point2' #开始另一个点的追踪
+  - 'command: say a'
+  - 'op: say b'
+  - 'console: say c' #以玩家身份、op身份、控制台执行命令
+  - 'message: &4你完成了这个目标！'
+  - 'title: &4你完成了！;&6这个目标！;20;20;20'
+  - 'actionbar: &4你完成了这个目标！'
+  - 'sound: entity.player.death;1;0'
+  - 'lightning: target;100;100;100'
+  - 'firework: player;#123456,#654321,#111111;BALL;#123456,#000000;0' #生成烟花，参数分别是位置，颜色，类型，渐变颜色和飞行高度(对应power)
+  - 'start: point2' #开始另一个点的追踪
 point2:
   target:
     scale: 2
     location: world,200,100,200 #目标点坐标
     display:
-      - '&6?'
-      - '&a神秘标记2'
+    - '&6?'
+    - '&a神秘标记2'
   mark:
     scale: 1
     distance: 5 #距离玩家的距离
     display:
-      - '✥'
-      - '%distance%格'
+    - '✥'
+    - '%distance%格'
   trigger-distance: 4
   fade-speed: 10
   actions:
-    - 'command: say b'
+  - 'command: say b'

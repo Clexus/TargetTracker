@@ -10,7 +10,7 @@ import org.jetbrains.annotations.NotNull;
 public class TrackStartEvent extends Event implements Cancellable {
     private static final HandlerList handlers = new HandlerList();
     private boolean cancelled;
-    private Player player;
+    private final Player player;
     private Point point;
 
     @Override

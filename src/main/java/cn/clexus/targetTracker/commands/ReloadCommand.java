@@ -2,8 +2,8 @@ package cn.clexus.targetTracker.commands;
 
 import cn.clexus.targetTracker.TargetTracker;
 import cn.clexus.targetTracker.managers.PointsManager;
+import cn.clexus.targetTracker.utils.DialogUtils;
 import cn.clexus.targetTracker.utils.I18n;
-import org.bukkit.ChatColor;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -26,9 +26,10 @@ public class ReloadCommand implements CommandExecutor, TabCompleter {
                     PointsManager.getInstance().loadPointsFromFolder(pointsFolder);
                     TargetTracker.getInstance().reloadConfig();
                     I18n.initialize(TargetTracker.getInstance().getConfig());
-                    I18n.sendMessage(sender,"reload",null);
+                    DialogUtils.init(TargetTracker.getInstance().getConfig().getConfigurationSection("player-points.defaults"));
+                    I18n.sendMessage(sender,"reload");
                 } catch (Exception e) {
-                    I18n.sendMessage(sender,"reload-failed",null);
+                    I18n.sendMessage(sender,"reload-failed");
                     e.printStackTrace();
                 }
             }
