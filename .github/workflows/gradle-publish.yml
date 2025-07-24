@@ -21,7 +21,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v3
         with:
-          gradle-version: 8.6
+          gradle-version: 8.12
 
       - name: Execute Gradle build
         run: ./gradlew createJars
@@ -30,7 +30,7 @@ jobs:
         run: mkdir TargetTracker && cp build/allJars/*.jar TargetTracker
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: TargetTracker-Snapshot
           path: TargetTracker
